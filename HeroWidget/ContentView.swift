@@ -6,16 +6,30 @@
 //
 
 import SwiftUI
+import WidgetKit
+
+let superHeroArray = [superman, batman, ironman]
 
 struct ContentView: View {
+    @AppStorage("hero", store: UserDefaults(suiteName: "group.com.italostuardo.HeroWidget"))
+    var heroData: Data = Data()
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+            ForEach(superHeroArray) { array in
+                HeroView(hero: array).onTapGesture {
+                    saveToDefaults(hero: array)
+                }
+            }
         }
-        .padding()
+    }
+    
+    func saveToDefaults(hero: Superhero) {
+        if let heroData = try? JSONEncoder().encode(hero) {
+            self.heroData = heroData
+            print(hero.name)
+            WidgetCenter.shared.reloadTimelines(ofKind: "WidgetHero")
+        }
     }
 }
 
